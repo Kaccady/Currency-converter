@@ -1,23 +1,71 @@
-import React, { Component } from "react";
-import fetchedCurrency from "./json";
+import React, { Component, useState } from "react";
+import { connect } from "react-redux";
+import { FetchData } from "./actions/data";
 
-const Currency = ({ props: { rates } }) => {
-  for (let id in rates){return (<p>{id}</p>)}
-}
+const Currency = props => {
+  const [currentValue, setCurrentValue] = useState(1);
+  return (
+    <div className="column">
+      <h1>All currencies</h1>
+      <input list="data" onChange={() => setCurrentValue(currentValue)} /><p>{currentValue}</p>
+      <datalist id="data">
+        {props.rates.map(item => (
+          <option value={item.id} id={item.value} />
+        ))}
+      </datalist>
+      {props.rates.map((item, index) => {
+        return (
+          <div className="oneCurrency" key={index}>
+            <p>{"1"}</p>
+            <p>{item.id + " ="}</p>
+            <p>{item.value}</p>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 class App extends Component {
-  state = { data: fetchedCurrency };
+  componentDidMount() {
+    this.props.fetchData("https://api.exchangeratesapi.io/latest?base=USD");
+  }
   render() {
-    const clone = {};
-    for (let key in this.state.data.rates) {
-      clone.id = key;
-      clone.value = this.state.data.rates[key];
-      console.log(clone);
+    if (this.props.hasErrored) {
+      return <p>Sorry! There was an error loading the currency</p>;
+    }
+
+    if (this.props.isLoading) {
+      return <p>Loading…</p>;
     }
     return (
-      <div className="App"><Currency props={this.state.data}/></div>
+      <div className="App">
+        <Currency rates={this.props.rates} />
+      </div>
     );
   }
 }
 
-export default App;
+const mapStateToProps = state => {
+  let rates = [];
+  let i = 0;
+  for (let key in state.data.rates) {
+    rates[i++] = { value: state.data.rates[key], id: key };
+  }
+  return {
+    rates: rates,
+    hasErrored: state.dataHasErrored,
+    isLoading: state.dataIsLoading
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchData: url => dispatch(FetchData(url))
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);
