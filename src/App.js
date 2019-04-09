@@ -1,36 +1,17 @@
-import React, { Component, useState } from "react";
+import React, { Component } from "react";
 import { connect } from "react-redux";
 import { FetchData } from "./actions/data";
+import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
+import Currency from './Currency';
 
-const Currency = props => {
-  const [currentValue, setCurrentValue] = useState(1);
-  return (
-    <div className="column">
-      <h1>All currencies</h1>
-      <input list="data" onChange={() => setCurrentValue(currentValue)} /><p>{currentValue}</p>
-      <datalist id="data">
-        {props.rates.map(item => (
-          <option value={item.id} id={item.value} />
-        ))}
-      </datalist>
-      {props.rates.map((item, index) => {
-        return (
-          <div className="oneCurrency" key={index}>
-            <p>{"1"}</p>
-            <p>{item.id + " ="}</p>
-            <p>{item.value}</p>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
 
 class App extends Component {
   componentDidMount() {
     this.props.fetchData("https://api.exchangeratesapi.io/latest?base=USD");
   }
   render() {
+    const renderConverter = () => <p>ggg</p>;
+    const renderCurrency=()=><Currency rates={this.props.rates} />;
     if (this.props.hasErrored) {
       return <p>Sorry! There was an error loading the currency</p>;
     }
@@ -39,9 +20,15 @@ class App extends Component {
       return <p>Loading…</p>;
     }
     return (
-      <div className="App">
-        <Currency rates={this.props.rates} />
-      </div>
+      <Router><div className="App">
+        <div>
+          <Link to='/'><h1>Converter</h1></Link>
+          <Link to='/currencies'><h1>All currencies</h1></Link>
+        </div>
+        <Route exact path='/' component={renderConverter}/>
+        <Route path='/currencies' component={renderCurrency}/>
+
+      </div></Router>
     );
   }
 }
