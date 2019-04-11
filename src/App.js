@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { FetchData } from "./actions/data";
 import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
 import Currency from './Currency';
+import Converter from './Converter';
 
 
 class App extends Component {
@@ -10,7 +11,7 @@ class App extends Component {
     this.props.fetchData("https://api.exchangeratesapi.io/latest?base=USD");
   }
   render() {
-    const renderConverter = () => <p>ggg</p>;
+    const renderConverter = () =><Converter rates={this.props.rates}/>;
     const renderCurrency=()=><Currency rates={this.props.rates} />;
     if (this.props.hasErrored) {
       return <p>Sorry! There was an error loading the currency</p>;

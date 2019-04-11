@@ -1,9 +1,42 @@
-import React, { useState } from "react";
-const Currency = props => {
+import React, { useState, useReducer } from "react";
+
+const Currency = ({ rates }) => {
+  const initialProps = Array(rates.length).fill(false);
+
   const [currentName, setCurrentName] = useState("USD");
   const [exchangeValue, setExchangeValue] = useState(1);
   const [sendValue, setSendValue] = useState(1);
-  const [isFavorite, setIsFavorite] = useState([1, , 0, 0, , , , , ,]);
+
+  const [favouriteOptions, dispatch] = useReducer(
+    (favouriteOptions, { type, newOptions }) => {
+      switch (type) {
+        case "setValue":
+          return newOptions;
+        default:
+          return favouriteOptions;
+      }
+    },
+    initialProps
+  );
+
+  const handleSetFavourite = index => {
+    let newOptions = favouriteOptions.slice();
+    newOptions.splice(index, 1, !favouriteOptions[index]);
+    dispatch({ type: "setValue", newOptions });
+  };
+
+  const handleSetCurrentName = event => {
+    setCurrentName(event.target.value);
+    let i = rates
+      .map(item => {
+        return item.id === event.target.value;
+      })
+      .indexOf(true);
+    if (rates[i]) {
+      setExchangeValue(rates[i].value);
+    }
+  };
+
   return (
     <div className="column">
       <div>
@@ -15,58 +48,38 @@ const Currency = props => {
           value={currentName}
           list="data"
           onClick={() => {
-            setCurrentName("");
+			setCurrentName("");
           }}
-          onChange={event => {
-            setCurrentName(event.target.value);
-            let i = props.rates
-              .map(item => {
-                return item.id === event.target.value;
-              })
-              .indexOf(true);
-            if (props.rates[i]) {
-              console.log(props.rates[i].value);
-              setExchangeValue(props.rates[i].value);
-            }
-          }}
+          onChange={handleSetCurrentName}
         />
       </div>
       <datalist id="data">
-        {props.rates.map(item => (
-          <option value={item.id} key={item.value} />
+        {rates.map(({ id, value }) => (
+          <option value={id} key={value} />
         ))}
-      </datalist>
-      {props.rates.map((item, index) => {
+      </datalist><div className='column'>
+      {rates.map(({ id, value }, index) => {
         return (
           <div
             className={
-              (isFavorite[index]) ? "activeCurrency oneCurrency" : "oneCurrency"
+              favouriteOptions[index]
+                ? "activeCurrency oneCurrency"
+                : "oneCurrency"
             }
             key={index}
           >
             <p>{sendValue}</p>
-            <p>{item.id + " ="}</p>
-            <p>{(sendValue * item.value) / exchangeValue}</p>
+            <p>{id + " ="}</p>
+            <p>{(sendValue * value) / exchangeValue}</p>
             <p>{currentName}</p>
             <span
               id={index}
-              onClick={event => {
-                let a = isFavorite;
-                console.log(a[event.target.id]);
-                console.log(isFavorite[event.target.id]);
-                if(a[event.target.id]){
-                    a.splice(event.target.id,1,false);
-                    setIsFavorite(a);
-                }else{
-                    a.splice(event.target.id,1,true);
-                    setIsFavorite(a);
-                }
-              }}
+              onClick={() => handleSetFavourite(index)}
               className="star"
             />
           </div>
         );
-      })}
+      })}</div>
     </div>
   );
 };
