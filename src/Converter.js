@@ -8,7 +8,7 @@ const Converter = ({ rates }) => {
     rates[0] ? [rates[5].value, rates[3].value] : [99, 99]
   );
   const [value, SetValue] = useState(
-    rates[0] ? [rates[5].value, rates[3].value] : [99, 99]
+    rates[0] ? [rates[5].value, rates[3].value.toFixed(4)] : [99, 99]
   );
 
   const Options = rates.map(({ id, value }) => (
@@ -18,15 +18,13 @@ const Converter = ({ rates }) => {
   ));
   const handleValue = event => {
     let inverse = Number(!Number(event.target.id));
-    console.log(inverse);
     let newValue = value.slice();
-    newValue.splice(event.target.id, 1, event.target.value);
-    newValue.splice(
-      inverse,
-      1,
+    let prettyNumber = +(
       (exchangeValue[inverse] / exchangeValue[event.target.id]) *
-        event.target.value
-    );
+      event.target.value
+    ).toFixed(4);
+    newValue.splice(event.target.id, 1, event.target.value);
+    newValue.splice(inverse, 1, prettyNumber);
     SetValue(newValue);
   };
 
@@ -44,7 +42,7 @@ const Converter = ({ rates }) => {
       newValue.splice(event.target.id, 1, rates[i].value);
       setExchangeValue(newValue);
       let updateValue = value.slice();
-      updateValue.splice(1, 1, (newValue[1] / newValue[0]) * value[0]);
+      updateValue.splice(1, 1, ((newValue[1] / newValue[0]) * value[0]).toFixed(4));
       SetValue(updateValue);
     }
   };
@@ -52,13 +50,8 @@ const Converter = ({ rates }) => {
     <div>
       {" "}
       <div className="column">
-        <input id="0" value={value[0]} onChange={handleValue} />
-        <input
-          id="1"
-          value={value[1]}
-          onChange={handleValue}
-          //value={(exchangeValue[1] / exchangeValue[0]) * value}
-        />
+        <input id="0" type="number" value={value[0]} onChange={handleValue} />
+        <input id="1" type="number" value={value[1]} onChange={handleValue} />
       </div>
       <div className="column">
         {" "}

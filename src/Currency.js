@@ -7,6 +7,12 @@ const Currency = ({ rates }) => {
   const [exchangeValue, setExchangeValue] = useState(1);
   const [sendValue, setSendValue] = useState(1);
 
+  const Options = rates.map(({ id, value }) => (
+    <option value={id} key={value}>
+      {id}
+    </option>
+  ));
+
   const [favouriteOptions, dispatch] = useReducer(
     (favouriteOptions, { type, newOptions }) => {
       switch (type) {
@@ -44,42 +50,36 @@ const Currency = ({ rates }) => {
           value={sendValue}
           onChange={event => setSendValue(event.target.value)}
         />
-        <input
+        <select
           value={currentName}
-          list="data"
-          onClick={() => {
-			setCurrentName("");
-          }}
           onChange={handleSetCurrentName}
-        />
+        >
+          {Options}
+        </select>
       </div>
-      <datalist id="data">
-        {rates.map(({ id, value }) => (
-          <option value={id} key={value} />
-        ))}
-      </datalist><div className='column'>
-      {rates.map(({ id, value }, index) => {
-        return (
-          <div
-            className={
-              favouriteOptions[index]
-                ? "activeCurrency oneCurrency"
-                : "oneCurrency"
-            }
-            key={index}
-          >
-            <p>{sendValue}</p>
-            <p>{id + " ="}</p>
-            <p>{(sendValue * value) / exchangeValue}</p>
-            <p>{currentName}</p>
-            <span
-              id={index}
-              onClick={() => handleSetFavourite(index)}
-              className="star"
-            />
-          </div>
-        );
-      })}</div>
+      <div className="column">
+        {rates.map(({ id, value }, index) => {
+          return (
+            <div
+              className={
+                favouriteOptions[index]
+                  ? "activeCurrency oneCurrency"
+                  : "oneCurrency"
+              }
+              key={index}
+            >
+              <p className='valueGetter'>{sendValue}</p>
+              <p className='nameCurrency'>{id + " ="}</p>
+              <p className='valueTranslator'>{Number(((sendValue * value) / exchangeValue).toFixed(4))}</p>
+              <span
+                id={index}
+                onClick={() => handleSetFavourite(index)}
+                className={+favouriteOptions[index]?'activeStar star':'star'}
+              />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

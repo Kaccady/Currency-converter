@@ -1,18 +1,17 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { FetchData } from "./actions/data";
-import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
-import Currency from './Currency';
-import Converter from './Converter';
-
+import { BrowserRouter as Router, Route, NavLink } from "react-router-dom";
+import Currency from "./Currency";
+import Converter from "./Converter";
 
 class App extends Component {
   componentDidMount() {
     this.props.fetchData("https://api.exchangeratesapi.io/latest?base=USD");
   }
   render() {
-    const renderConverter = () =><Converter rates={this.props.rates}/>;
-    const renderCurrency=()=><Currency rates={this.props.rates} />;
+    const renderConverter = () => <Converter rates={this.props.rates} />;
+    const renderCurrency = () => <Currency rates={this.props.rates} />;
     if (this.props.hasErrored) {
       return <p>Sorry! There was an error loading the currency</p>;
     }
@@ -21,15 +20,28 @@ class App extends Component {
       return <p>Loading…</p>;
     }
     return (
-      <Router><div className="App">
-        <div>
-          <Link to='/'><h1>Converter</h1></Link>
-          <Link to='/currencies'><h1>All currencies</h1></Link>
+      <Router>
+        <div className="App">
+          <div className='wrap'>
+            <NavLink
+              activeClassName="linkButtonActive"
+              exact to="/"
+              className="linkButton"
+            >
+              Converter
+            </NavLink>
+            <NavLink
+              activeClassName="linkButtonActive"
+              to="/currencies"
+              className="linkButton"
+            >
+              All currencies
+            </NavLink>
+          </div>
+          <Route exact path="/" component={renderConverter} />
+          <Route path="/currencies" component={renderCurrency} />
         </div>
-        <Route exact path='/' component={renderConverter}/>
-        <Route path='/currencies' component={renderCurrency}/>
-
-      </div></Router>
+      </Router>
     );
   }
 }
