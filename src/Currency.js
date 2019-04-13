@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { connect } from "react-redux";
 import { setFavourite } from "./actions/favouriteOptions";
 
-const Currency = ({ rates, favouriteOptions }) => {
+const Currency = ({ rates, favouriteOptions, dispatch }) => {
   const [currentName, setCurrentName] = useState("USD");
   const [exchangeValue, setExchangeValue] = useState(1);
   const [sendValue, setSendValue] = useState(1);
+
+  const favouriteGenerator = () => {
+    if (favouriteOptions[32] === undefined){
+    let newOptions = Array(33).fill(false);
+    dispatch(setFavourite(newOptions));}
+  };
+
+  useEffect(()=> {favouriteGenerator()});
 
   const Options = rates.map(({ id, value }) => (
     <option value={id} key={value}>
@@ -16,7 +24,7 @@ const Currency = ({ rates, favouriteOptions }) => {
   const handleSetFavourite = index => {
     let newOptions = favouriteOptions.slice();
     newOptions.splice(index, 1, !favouriteOptions[index]);
-    setFavourite(newOptions);
+    dispatch(setFavourite(newOptions));
   };
 
   const handleSetCurrentName = event => {
@@ -78,10 +86,5 @@ const mapStateToProps = state => {
     favouriteOptions: state.favouriteOptions
   };
 };
-const mapDispatchToProps =  newOptions => {
-  return { type: "setValue", newOptions };
-};
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Currency);
+
+export default connect(mapStateToProps)(Currency);

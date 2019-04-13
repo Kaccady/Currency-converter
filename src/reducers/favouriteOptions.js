@@ -1,7 +1,7 @@
-export function favouriteOptions(state=Array(33).fill(false),action) {
+export function favouriteOptions(state=[],action) {
   switch (action.type) {
     case "SET_FAVOURITE":
-      return action.newOptions;
+      return action.favouriteOptions;
     default:
       return state;
   }
