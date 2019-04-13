@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { connect } from "react-redux";
 
 const Converter = ({ rates }) => {
   const [currentName, setCurrentName] = useState(
@@ -42,7 +43,11 @@ const Converter = ({ rates }) => {
       newValue.splice(event.target.id, 1, rates[i].value);
       setExchangeValue(newValue);
       let updateValue = value.slice();
-      updateValue.splice(1, 1, ((newValue[1] / newValue[0]) * value[0]).toFixed(4));
+      updateValue.splice(
+        1,
+        1,
+        +((newValue[1] / newValue[0]) * value[0]).toFixed(4)
+      );
       SetValue(updateValue);
     }
   };
@@ -65,4 +70,9 @@ const Converter = ({ rates }) => {
     </div>
   );
 };
-export default Converter;
+const mapStateToProps = state => {
+  return {
+    rates: state.data
+  };
+};
+export default connect(mapStateToProps)(Converter);

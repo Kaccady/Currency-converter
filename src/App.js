@@ -10,8 +10,6 @@ class App extends Component {
     this.props.fetchData("https://api.exchangeratesapi.io/latest?base=USD");
   }
   render() {
-    const renderConverter = () => <Converter rates={this.props.rates} />;
-    const renderCurrency = () => <Currency rates={this.props.rates} />;
     if (this.props.hasErrored) {
       return <p>Sorry! There was an error loading the currency</p>;
     }
@@ -22,10 +20,11 @@ class App extends Component {
     return (
       <Router>
         <div className="App">
-          <div className='wrap'>
+          <div className="wrap">
             <NavLink
               activeClassName="linkButtonActive"
-              exact to="/"
+              exact
+              to="/"
               className="linkButton"
             >
               Converter
@@ -38,8 +37,8 @@ class App extends Component {
               All currencies
             </NavLink>
           </div>
-          <Route exact path="/" component={renderConverter} />
-          <Route path="/currencies" component={renderCurrency} />
+          <Route exact path="/" component={Converter} />
+          <Route path="/currencies" component={Currency} />
         </div>
       </Router>
     );
@@ -47,13 +46,7 @@ class App extends Component {
 }
 
 const mapStateToProps = state => {
-  let rates = [];
-  let i = 0;
-  for (let key in state.data.rates) {
-    rates[i++] = { value: state.data.rates[key], id: key };
-  }
   return {
-    rates: rates,
     hasErrored: state.dataHasErrored,
     isLoading: state.dataIsLoading
   };

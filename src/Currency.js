@@ -1,8 +1,8 @@
-import React, { useState, useReducer } from "react";
+import React, { useState } from "react";
+import { connect } from "react-redux";
+import { setFavourite } from "./actions/favouriteOptions";
 
-const Currency = ({ rates }) => {
-  const initialProps = Array(rates.length).fill(false);
-
+const Currency = ({ rates, favouriteOptions }) => {
   const [currentName, setCurrentName] = useState("USD");
   const [exchangeValue, setExchangeValue] = useState(1);
   const [sendValue, setSendValue] = useState(1);
@@ -13,22 +13,10 @@ const Currency = ({ rates }) => {
     </option>
   ));
 
-  const [favouriteOptions, dispatch] = useReducer(
-    (favouriteOptions, { type, newOptions }) => {
-      switch (type) {
-        case "setValue":
-          return newOptions;
-        default:
-          return favouriteOptions;
-      }
-    },
-    initialProps
-  );
-
   const handleSetFavourite = index => {
     let newOptions = favouriteOptions.slice();
     newOptions.splice(index, 1, !favouriteOptions[index]);
-    dispatch({ type: "setValue", newOptions });
+    setFavourite(newOptions);
   };
 
   const handleSetCurrentName = event => {
@@ -50,10 +38,7 @@ const Currency = ({ rates }) => {
           value={sendValue}
           onChange={event => setSendValue(event.target.value)}
         />
-        <select
-          value={currentName}
-          onChange={handleSetCurrentName}
-        >
+        <select value={currentName} onChange={handleSetCurrentName}>
           {Options}
         </select>
       </div>
@@ -68,13 +53,17 @@ const Currency = ({ rates }) => {
               }
               key={index}
             >
-              <p className='valueGetter'>{sendValue}</p>
-              <p className='nameCurrency'>{id + " ="}</p>
-              <p className='valueTranslator'>{Number(((sendValue * value) / exchangeValue).toFixed(4))}</p>
+              <p className="valueGetter">{sendValue}</p>
+              <p className="nameCurrency">{id + " ="}</p>
+              <p className="valueTranslator">
+                {Number(((sendValue * value) / exchangeValue).toFixed(4))}
+              </p>
               <span
                 id={index}
                 onClick={() => handleSetFavourite(index)}
-                className={+favouriteOptions[index]?'activeStar star':'star'}
+                className={
+                  +favouriteOptions[index] ? "activeStar star" : "star"
+                }
               />
             </div>
           );
@@ -83,4 +72,16 @@ const Currency = ({ rates }) => {
     </div>
   );
 };
-export default Currency;
+const mapStateToProps = state => {
+  return {
+    rates: state.data,
+    favouriteOptions: state.favouriteOptions
+  };
+};
+const mapDispatchToProps =  newOptions => {
+  return { type: "setValue", newOptions };
+};
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Currency);

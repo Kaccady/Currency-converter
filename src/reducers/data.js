@@ -21,7 +21,7 @@ export function dataIsLoading(state = false, action) {
 export function data(state = [], action) {
   switch (action.type) {
     case "FETCH_DATA_SUCCESS":
-      return action.data;
+      return action.rates;
 
     default:
       return state;

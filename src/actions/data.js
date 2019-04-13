@@ -13,11 +13,17 @@ export function dataIsLoading(bool) {
 }
 
 export function FetchDataSuccess(data) {
+  let rates = [];
+  let i = 0;
+  for (let key in data.rates) {
+    rates[i++] = { value: data.rates[key], id: key };
+  }
   return {
     type: "FETCH_DATA_SUCCESS",
-    data
+    rates
   };
 }
+
 export function FetchData(url) {
   return dispatch => {
     dispatch(dataIsLoading(true));
