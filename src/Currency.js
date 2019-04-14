@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { setFavourite } from "./actions/favouriteOptions";
 
@@ -8,12 +8,13 @@ const Currency = ({ rates, favouriteOptions, dispatch }) => {
   const [sendValue, setSendValue] = useState(1);
 
   const favouriteGenerator = () => {
-    if (favouriteOptions[32] === undefined){
-    let newOptions = Array(33).fill(false);
-    dispatch(setFavourite(newOptions));}
+    if (favouriteOptions[32] === undefined) {
+      let newOptions = Array(33).fill(false);
+      dispatch(setFavourite(newOptions));
+    }
   };
 
-  useEffect(()=> {favouriteGenerator()});
+  useEffect(() => favouriteGenerator());
 
   const Options = rates.map(({ id, value }) => (
     <option value={id} key={value}>

@@ -1,16 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 
 const Converter = ({ rates }) => {
-  const [currentName, setCurrentName] = useState(
-    rates[0] ? [rates[5].id, rates[3].id] : []
-  );
-  const [exchangeValue, setExchangeValue] = useState(
-    rates[0] ? [rates[5].value, rates[3].value] : [99, 99]
-  );
-  const [value, SetValue] = useState(
-    rates[0] ? [rates[5].value, rates[3].value.toFixed(4)] : [99, 99]
-  );
+  const [currentName, setCurrentName] = useState([]);
+  const [exchangeValue, setExchangeValue] = useState();
+  const [value, SetValue] = useState([]);
+  const [load, setLoad] = useState(false);
+  const converterGenerator = () => {
+    if ((rates[0] !== undefined) & (load === false)) {
+      setLoad(true);
+      setCurrentName([rates[5].id, rates[3].id]);
+      setExchangeValue([rates[5].value, rates[3].value]);
+      SetValue([rates[5].value, rates[3].value.toFixed(4)]);
+    }
+  };
+
+  useEffect(() => converterGenerator());
 
   const Options = rates.map(({ id, value }) => (
     <option value={id} key={value}>
@@ -31,35 +36,42 @@ const Converter = ({ rates }) => {
 
   const handleSetCurrentName = event => {
     let newCurrentName = currentName.slice();
-    newCurrentName.splice(event.target.id, 1, event.target.value);
-    setCurrentName(newCurrentName);
-    let i = rates
-      .map(item => {
-        return item.id === event.target.value;
-      })
-      .indexOf(true);
-    if (rates[i]) {
-      let newValue = exchangeValue.slice();
+    let inverse = Number(!Number(event.target.id));
+    let newValue = exchangeValue.slice();
+    let updateValue = value.slice();
+
+    if (event.target.value === currentName[inverse]) {
+      newCurrentName.reverse();
+      newValue.reverse();
+    } else {
+      newCurrentName.splice(event.target.id, 1, event.target.value);
+
+      let i = rates
+        .map(item => {
+          return item.id === event.target.value;
+        })
+        .indexOf(true);
+
       newValue.splice(event.target.id, 1, rates[i].value);
-      setExchangeValue(newValue);
-      let updateValue = value.slice();
-      updateValue.splice(
-        1,
-        1,
-        +((newValue[1] / newValue[0]) * value[0]).toFixed(4)
-      );
-      SetValue(updateValue);
     }
+
+    updateValue.splice(
+      1,
+      1,
+      +((newValue[1] / newValue[0]) * value[0]).toFixed(4)
+    );
+
+    setCurrentName(newCurrentName);
+    setExchangeValue(newValue);
+    SetValue(updateValue);
   };
   return (
     <div>
-      {" "}
       <div className="column">
         <input id="0" type="number" value={value[0]} onChange={handleValue} />
         <input id="1" type="number" value={value[1]} onChange={handleValue} />
       </div>
       <div className="column">
-        {" "}
         <select id="0" value={currentName[0]} onChange={handleSetCurrentName}>
           {Options}
         </select>
